@@ -107,17 +107,14 @@ class SnapPassRoutesTestCase(TestCase):
         snappass.app.config['TESTING'] = True
         self.app = snappass.app.test_client()
         self.original_url_prefix = snappass.URL_PREFIX
-        self.original_host_override = snappass.HOST_OVERRIDE
         self.original_app_base_url = snappass.APP_BASE_URL
-        self.original_trusted_hosts = snappass.TRUSTED_HOSTS
-        self.original_no_ssl = snappass.NO_SSL
 
     def tearDown(self):
+        # Restore module-level config mutated by tests so it does not leak
+        # between test cases (URL_PREFIX by test_url_prefix, APP_BASE_URL by
+        # test_uses_app_base_url_with_untrusted_host_header).
         snappass.URL_PREFIX = self.original_url_prefix
-        snappass.HOST_OVERRIDE = self.original_host_override
         snappass.APP_BASE_URL = self.original_app_base_url
-        snappass.TRUSTED_HOSTS = self.original_trusted_hosts
-        snappass.NO_SSL = self.original_no_ssl
 
     def test_health_check(self):
         response = self.app.get('/_/_/health')
@@ -224,6 +221,9 @@ class SnapPassRoutesTestCase(TestCase):
         self.assertEqual(rv.status_code, 400)
 
     def test_uses_app_base_url_with_untrusted_host_header(self):
+        # When APP_BASE_URL is configured, the inbound Host header is never
+        # used to derive the base URL, so an untrusted host is harmless: the
+        # request succeeds (200) and the generated link uses APP_BASE_URL.
         snappass.APP_BASE_URL = 'https://snappass.example.org'
         rv = self.app.post(
             '/api/set_password/',
