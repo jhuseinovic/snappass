@@ -94,11 +94,7 @@ need to change this.
 
 ``REDIS_PREFIX``: (optional, defaults to ``"snappass"``) prefix used on redis keys to prevent collisions with other potential clients
 
-``HOST_OVERRIDE``: (optional) Used to override the base URL if the app is unaware. Useful when running behind reverse proxies like an identity-aware SSO. Example: ``sub.domain.com``
-
-``APP_BASE_URL``: (optional, recommended) Canonical absolute base URL used for generated links and API problem URLs. Example: ``https://snappass.example.com``
-
-``TRUSTED_HOSTS``: (optional) Comma-separated allowlist of hostnames accepted from inbound Host headers when ``APP_BASE_URL`` and ``HOST_OVERRIDE`` are not set. Defaults to ``localhost,127.0.0.1,::1``.
+``HOST_OVERRIDE``: (optional, recommended in production) Canonical hostname used to build the base URL for generated links. Useful when running behind reverse proxies like an identity-aware SSO, and prevents host header injection (see below). Example: ``sub.domain.com``
 
 ``SNAPPASS_BIND_ADDRESS``: (optional) Used to override the default bind address of 0.0.0.0 for flask app Example: ``127.0.0.1``
 
@@ -107,11 +103,10 @@ need to change this.
 Host Header Security
 --------------------
 
-SnapPass generates security-sensitive links (for password retrieval). To prevent host header injection in generated links:
+SnapPass generates security-sensitive links (for password retrieval). When ``HOST_OVERRIDE`` is not set, the base URL of those links is derived from the request's ``Host`` header, which a client can spoof.
 
-- Prefer setting ``APP_BASE_URL`` in production.
-- If ``APP_BASE_URL`` is not set, configure ``TRUSTED_HOSTS`` to the exact hostnames you expect.
-- Requests with an untrusted ``Host`` header are rejected with ``400 Bad Request`` when SnapPass must derive the base URL from the request.
+- Set ``HOST_OVERRIDE`` to your canonical hostname in production. It is then used for every generated link and the inbound ``Host`` header is ignored.
+- If ``HOST_OVERRIDE`` is not set, SnapPass only derives the base URL from loopback hosts (``localhost``, ``127.0.0.1``, ``::1``); requests with any other ``Host`` header are rejected with ``400 Bad Request``.
 
 APIs
 ----
