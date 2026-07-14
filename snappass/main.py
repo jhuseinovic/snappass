@@ -167,7 +167,7 @@ def set_password(password, ttl):
     #print('Storing password in Redis with key: %s, TTL: %s' % (storage_key, ttl))
     encrypted_password, encryption_key = encrypt(password)
     #print('Encrypted password: %s, Encryption key: %s' % (encrypted_password, encryption_key))
-    redis_client.set(storage_key, ttl, encrypted_password)
+    redis_client.setex(storage_key, ttl, encrypted_password)
     #print('Password stored in Redis with key: %s, TTL: %s' % (storage_key, ttl))
     encryption_key = encryption_key.decode('utf-8')
     #print('Returning token: %s~%s' % (storage_key, encryption_key))
