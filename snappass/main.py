@@ -165,15 +165,10 @@ def set_password(password, ttl):
     is stored, and the decryption key.
     """
     storage_key = REDIS_PREFIX + uuid.uuid4().hex
-    print('Storing password in Redis with key: %s, TTL: %s' % (storage_key, ttl))
     encrypted_password, encryption_key = encrypt(password)
-    print('Encrypted password: %s, Encryption key: %s' % (encrypted_password, encryption_key))
-    redis_client.setex(storage_key, ttl, encrypted_password)
-    print('Password stored in Redis with key: %s, TTL: %s' % (storage_key, ttl))
+    redis_client.set(storage_key, ttl, encrypted_password)
     encryption_key = encryption_key.decode('utf-8')
-    print('Returning token: %s~%s' % (storage_key, encryption_key))
     token = TOKEN_SEPARATOR.join([storage_key, encryption_key])
-    print('Final Token: %s' % token)
     return token
 
 
@@ -250,23 +245,15 @@ def index():
 def handle_password():
     password = request.form.get('password')
     ttl = request.form.get('ttl')
-    print('Password: %s, TTL: %s' % (password, ttl))
     if clean_input():
-        print('CLEAN Password: %s, TTL: %s' % (password, ttl))
         ttl = TIME_CONVERSION[ttl.lower()]
-        print('TTL in seconds: %s' % ttl)
         token = set_password(password, ttl)
-        print('Token: %s' % token)
         base_url = set_base_url(request)
-        print('Base URL: %s' % base_url)
         link = base_url + quote_plus(token)
-        print('Link: %s' % link)
         if request.accept_mimetypes.accept_json and not \
            request.accept_mimetypes.accept_html:
-            print('Returning JSON response %s (%s)', (link, ttl))
             return jsonify(link=link, ttl=ttl)
         else:
-            print('Returning HTML response %s (%s)', (link, ttl))
             return render_template('confirm.html', password_link=link)
     else:
         abort(500)
