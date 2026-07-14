@@ -253,7 +253,7 @@ def handle_password():
     #print('Password: %s, TTL: %s' % (password, ttl))
     if clean_input():
         #print('CLEAN Password: %s, TTL: %s' % (password, ttl))
-        ttl = TIME_CONVERSION[ttl.lower()]
+        ttl = TIME_CONVERSION.get(ttl.lower(), DEFAULT_API_TTL)
         #print('TTL in seconds: %s' % ttl)
         token = set_password(password, ttl)
         #print('Token: %s' % token)
