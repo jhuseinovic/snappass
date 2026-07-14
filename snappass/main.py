@@ -43,11 +43,11 @@ if os.environ.get('MOCK_REDIS'):
 
 elif os.environ.get('REDIS_URL'):
     print('Connecting to Redis: %s', os.environ.get('REDIS_URL'))
-    redis_client = redis.StrictRedis.from_url(os.environ.get('REDIS_URL'))
+    redis_client = redis.StrictRedis.from_url(os.environ.get('REDIS_URL') + '?ssl_cert_reqs=none')
 
 elif os.environ.get('REDISCLOUD_URL'):
     print('Connecting to Redis Cloud: %s', os.environ.get('REDISCLOUD_URL'))
-    redis_client = redis.StrictRedis.from_url(os.environ.get('REDISCLOUD_URL'))
+    redis_client = redis.StrictRedis.from_url(os.environ.get('REDISCLOUD_URL') + '?ssl_cert_reqs=none')
 
 else:
     redis_host = os.environ.get('REDIS_HOST', 'localhost')
