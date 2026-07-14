@@ -249,8 +249,11 @@ def handle_password():
     if clean_input():
         print('CLEAN Password: %s, TTL: %s' % (password, ttl))
         ttl = TIME_CONVERSION[ttl.lower()]
+        print('TTL in seconds: %s' % ttl)
         token = set_password(password, ttl)
+        print('Token: %s' % token)
         base_url = set_base_url(request)
+        print('Base URL: %s' % base_url)
         link = base_url + quote_plus(token)
         print('Link: %s' % link)
         if request.accept_mimetypes.accept_json and not \
