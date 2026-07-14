@@ -42,9 +42,11 @@ if os.environ.get('MOCK_REDIS'):
     redis_client = FakeStrictRedis()
 
 elif os.environ.get('REDIS_URL'):
+    print('Connecting to Redis: %s', os.environ.get('REDIS_URL'))
     redis_client = redis.StrictRedis.from_url(os.environ.get('REDIS_URL'))
 
 elif os.environ.get('REDISCLOUD_URL'):
+    print('Connecting to Redis Cloud: %s', os.environ.get('REDISCLOUD_URL'))
     redis_client = redis.StrictRedis.from_url(os.environ.get('REDISCLOUD_URL'))
 
 else:
@@ -53,7 +55,7 @@ else:
     redis_db = os.environ.get('SNAPPASS_REDIS_DB', 0)
     redis_client = redis.StrictRedis(
         host=redis_host, port=redis_port, db=redis_db)
-        
+
 REDIS_PREFIX = os.environ.get('REDIS_PREFIX', 'snappass')
 
 TIME_CONVERSION = {'two weeks': 1209600, 'week': 604800, 'day': 86400,
