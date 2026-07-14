@@ -245,15 +245,20 @@ def index():
 def handle_password():
     password = request.form.get('password')
     ttl = request.form.get('ttl')
+    print('Password: %s, TTL: %s' % (password, ttl))
     if clean_input():
+        print('CLEAN Password: %s, TTL: %s' % (password, ttl))
         ttl = TIME_CONVERSION[ttl.lower()]
         token = set_password(password, ttl)
         base_url = set_base_url(request)
         link = base_url + quote_plus(token)
+        print('Link: %s' % link)
         if request.accept_mimetypes.accept_json and not \
            request.accept_mimetypes.accept_html:
+            print('Returning JSON response %s (%s)', (link, ttl))
             return jsonify(link=link, ttl=ttl)
         else:
+            print('Returning HTML response %s (%s)', (link, ttl))
             return render_template('confirm.html', password_link=link)
     else:
         abort(500)
